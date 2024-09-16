@@ -1,0 +1,332 @@
+---
+title: "Decathlon PCA"
+author: "Carla Cohen"
+date: "2024-06-25"
+output: html_document
+---
+
+# Introduction to R coding
+
+Today we are going to do some coding using the programming language R. 
+
+This document is in R markdown format, which allows you to intersperse lines of code and free text. 
+
+The grey boxes are the code, they always begin "```{r}" and end "```"
+To add a new chunk of code, click the green button in the top right hand corner of this window and choose "R". 
+
+This first chunk tells the document any general set up instructions (no need to worry about this today).
+
+Activity 1: Press the "play" button to run this chunk. 
+You will see some outputs in the console that tells you these packages are loaded.  
+These packages contains the instructions and the data that we will be using.  
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(FactoMineR)
+library(Rfast)
+library(factoextra)
+```
+
+
+# Using R markdown 
+
+Activity 2: Add a new code chunk!
+Write a simple sum e.g. 1+2
+When you press the "play" button (or Ctrl+enter) you will see the output of the code below the chunk i.e. "3"
+[1] means the first line
+```{r}
+1+2
+```
+
+
+# Assigning variables
+
+We can assign values to a variable using the "<-" notation
+e.g. 
+a <- 5
+
+Now you will see these values appear in the Global Environment (top right pane). 
+If you want to know what the variable is, you can print it out
+
+Activity 3: Assign the letters a and b to some numbers
+
+```{r}
+a <- 6
+b <- 8
+
+```
+
+Activity 4: Print one of your variables.  
+
+```{r}
+a
+```
+If you want to make the output more meaningful, you can add some text using the print command
+e.g. 
+print ("This is variable a")
+a
+
+Activity 5: Print some text and a variable 
+
+```{r}
+print ("This is variable a")
+a
+print ("My favourite number is ")
+b
+```
+Then we can do a sum using our variables
+
+Activity 6: Write a sum using your variables
+
+```{r}
+a+b
+```
+
+Those variables were whole numbers, or integers. 
+
+# Vectors
+
+We can also use vectors, which is like a list of numbers (although bear in mind that a "list" is also another data structure in R that we aren't going to use today!).
+
+A vector looks like this: 
+```{r}
+my_vector <- c(1, 2, 3, 4, 5)
+my_vector
+```
+
+You can also do sums using the vector
+
+Activity 7: Multiply my vector by 2 
+Note: use * for multiply
+
+
+```{r}
+my_vector*2
+```
+
+# Example dataset
+
+To do more interesting things we will need to have some data. 
+We can read in our own data files from our experiment, but in this case we will use one that is already built into R. 
+
+This command produces a variable called "decathlon" in the global environment
+
+```{r}
+data(decathlon)
+
+```
+
+Activity 8: Print the variable "decathlon"
+Can you describe what this dataset it showing? 
+What are the rows?
+What are the columns?
+What is the format of the data (numbers/text?)  
+
+```{r}
+decathlon
+```
+
+
+# Introduction to the decathlon dataset
+
+This dataset contains the results of decathlon events during two athletic meetings which took place one month apart in 2004: the Olympic Games in Athens (23 and 24 August), and the Decastar 2004 (25 and 26 September). 
+
+For both competitions, the following information is available for each athlete: 
+- performance for each of the 10 events   
+- total number of points (for each event, an athlete earns points based on performance; here the sum of points scored) 
+- final ranking  
+
+
+# Working with dataframes
+A table like the decathlon data is called a dataframe in R. 
+You can get the information for a particular column using the $ symbol. 
+For example using decathlon$Shot.put gives you all the data from the column "Shot.put"
+
+Actvity 9: Get the data from the column of your favourite event 
+
+```{r}
+decathlon$`100m`
+```
+You can see that it just gives you the numbers, you have lost the information related to which competitor it was. 
+
+# Plotting a graph of the data
+
+We can have a look at the distribution of the data, for example, how far did the different competitors throw the javelin?
+
+There are some very easy plotting functions in R (spoiler: they don't look very pretty!)
+We can use
+plot(data)
+hist(data)
+
+Activity 9: Use the plot and hist functions to draw a graph of the javelin data  
+When using plot, can you also sort the data to make it more meaningful?  
+NB to access the help for a function, type ?function in the console e.g. ?plot 
+
+```{r}
+plot(sort(decathlon$Javeline))
+```
+
+Question: What do these graphs tell you? 
+  
+# Finding out more about the javelin event? 
+
+We can quickly calculate some basic statistics of the javelin data, for example: 
+What is the mean javelin throw? What is the furthest?
+
+Activity 10: Calculate the mean javelin throw and furthest javelin throw. 
+Hint - use mean() and max()  
+
+```{r}
+mean(decathlon$Javeline)
+max(decathlon$Javeline)
+
+```
+Activity 11: Copy your code to plot the sorted javelin data. 
+Add a line for mean javelin throw to the plot using abline(h = ....)
+Can you change the colour of the line?  
+Can you add a title?  
+
+```{r}
+plot(sort(decathlon$Javeline))
+abline(h = mean(decathlon$Javeline), col = "red")
+```
+
+
+# Are athletes typically good at all throwing events?
+
+Did javelin score correlate with shot put?
+
+Activity 12: Draw a graph of javelin distance vs shot put distance using plot ()
+Add a regression line (line of best fit) to the plot
+- first calculate the regression line using lm()
+- draw the graph using plot()
+- add the regression line to the plot using abline()
+
+```{r}
+# calculate the regression line using lm()
+
+reg <- lm(Shot.put ~ Javeline, data = decathlon)
+
+# Draw the plot
+plot(decathlon$Javeline, decathlon$Shot.put)
+abline(reg, col = "blue")
+
+```
+
+You can quantify the correlation between javelin and shot put distance by calculating a correlation score (between 0 and 1) 
+
+Activity 13: Calculate the correlation score between javelin & shot put using cor()
+Hint - this will look very similar to the code used for the plot!
+
+```{r}
+cor(decathlon$Javeline, decathlon$Shot.put)
+cor(decathlon$High.jump, decathlon$Long.jump)
+```
+
+If you have time, compare two other events in the same way. Do they correlate better or worse than javelin and shot put? 
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+# What is the variance of each event? 
+This represents how widely variable the scores for each event are 
+e.g. the range of high jump scores might be much smaller than the range of 1500m scores. 
+
+Activity 14: Calculate the variance for each event using colVars()
+Hint you can do this for the whole dataset at once! 
+
+```{r}
+colVars(decathlon)
+```
+
+# Scale the data
+
+To make more in-depth analysis we can "scale the data". This means that each event will have a mean of 0 and a standard deviation of 1. 
+I will explain this in more detail if time! 
+
+The point of doing this is that we can compare across the different events more fairly. 
+
+Activity 15: Scale the data using the following steps.
+- remove the column for "Competition" using select () and assign it to a new dataframe called dec. Why do we need to do that?
+- scale dec and assign it to a new dataframe called dec_scaled 
+This produces a scaled dataset and draws a graph of the scaled javelin data.  
+
+```{r}
+# remove the column "Competition" because it isn't numeric
+dec <- select(decathlon, -Competition)
+dec
+# scale the data
+dec_scaled <- data.frame(scale(dec))
+```
+
+Activity 16: Plot the scaled data for Javelin using hist()
+
+```{r}
+hist(dec_scaled$Javeline)
+```
+
+
+
+# Principal component analysis
+
+We can perform a Principal Component Analysis (PCA) to look at how all of the events go together. 
+This analysis produces 3 outputs
+1. numerical summary (ignore)
+2. Graph of individuals: This shows you how similar the individual competitors were to one another. 
+3. Graph of variables: This shows you how much each event had on the overall result. 
+
+Activity 17: Perform a PCA on the scaled decathlon data using PCA()
+
+```{r}
+PCA(dec_scaled)
+```
+
+Questions:
+Which sports should you be good at if you want to win decathlon? 
+Which sports do competitors tend to be good at in groups?
+
+# Interpretation
+
+Add your interpretation here
+
+# Plot the PCA of competitors coloured by the competition they took part in
+
+Extended activity: Did the competitors perform similarly in both competitions?
+
+Add back the Competition column to the scaled results
+
+```{r}
+
+```
+
+Re-do the PCA, specifying Competition as a qualitative variable. 
+Then plot the PCA of individuals coloured by the competition using fviz_pca_ind() and habillage  
+Hint: use repel=TRUE to read the names more easily
+
+
+```{r}
+res.pca <- PCA()
+
+fviz_pca_ind(res.pca, ) 
+```
+
+
+
+
+
+# Save your script
+Email me carla.cohen@ndorms.ox.ac.uk if you would like to have a copy of it to keep.  
+
+# Knit the script
+This produces a nice html output with all the text, code and plots. 
+
+# Reference
+This tutorial was based on an analysis by Clement Ponsonnet
+https://github.com/clemonster/decathlon-pca
+
